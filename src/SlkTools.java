@@ -68,6 +68,10 @@ public class SlkTools {
     */
     public Boolean changeVersion(){
         Boolean resultado = false;
+        if(this.getFileNameIn()==null || this.getFileNameOut()==null){
+            this.errors.add("Faltan parametros.");
+            return false;
+        }
         try {
             String baseName = this.fileNameIn.substring(0,this.fileNameIn.lastIndexOf('/')+1);
             PdfReader reader = new PdfReader(this.getFileNameIn());
@@ -97,6 +101,10 @@ public class SlkTools {
     public boolean doMerge(){
 
         Boolean resultado = false;
+        if(this.getPathToMerge()==null || this.getFileNameOut()==null){
+            this.errors.add("Faltan parametros.");
+            return false;
+        }
         File folder = new File(this.getPathToMerge());
         File[] files = folder.listFiles();
 
@@ -193,19 +201,19 @@ public class SlkTools {
     }
 
 
-    public static void main(String[] args) {
-        SlkTools tool = new SlkTools();
-        tool.setPathToMerge("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP");
-        tool.setFileNameOut("ActaFinal.pdf");
-        System.out.println(tool.doMerge());
-        System.out.println(tool.getErrors());
+//    public static void main(String[] args) {
+//        SlkTools tool = new SlkTools();
+////        tool.setPathToMerge("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP");
+////        tool.setFileNameOut("ActaFinal.pdf");
+////        System.out.println(tool.doMerge());
+////        System.out.println(tool.getErrors());
 //        tool.setFileNameIn("/Users/jbenavides/Desktop/demoTool.pdf");
-//        tool.setVersion('4');
+////        tool.setVersion('4');
 //        tool.setDeleteFile(false);
-//        tool.setFileNameOut("demo 4.pdf");
+////        tool.setFileNameOut("demo version.pdf");
 //        System.out.println(tool.changeVersion());
 //        System.out.println(tool.getErrors());
-    }
+//    }
 
 
 }
