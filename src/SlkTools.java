@@ -201,19 +201,19 @@ public class SlkTools {
     }
 
 
-//    public static void main(String[] args) {
-//        SlkTools tool = new SlkTools();
-////        tool.setPathToMerge("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP");
-////        tool.setFileNameOut("ActaFinal.pdf");
-////        System.out.println(tool.doMerge());
-////        System.out.println(tool.getErrors());
-//        tool.setFileNameIn("/Users/jbenavides/Desktop/demoTool.pdf");
-////        tool.setVersion('4');
-//        tool.setDeleteFile(false);
-////        tool.setFileNameOut("demo version.pdf");
-//        System.out.println(tool.changeVersion());
+    public static void main(String[] args) {
+        SlkTools tool = new SlkTools();
+//        tool.setPathToMerge("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP");
+//        tool.setFileNameOut("ActaFinal.pdf");
+//        System.out.println(tool.doMerge());
 //        System.out.println(tool.getErrors());
-//    }
+        tool.setFileNameIn("/Users/jbenavides/Desktop/demoTool.pdf");
+//        tool.setVersion('4');
+        tool.setDeleteFile(false);
+//        tool.setFileNameOut("demo version.pdf");
+        System.out.println(tool.changeVersion());
+        System.out.println(tool.getErrors());
+    }
 
 
 }
