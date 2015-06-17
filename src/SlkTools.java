@@ -15,7 +15,30 @@ public class SlkTools {
     public Character version = '4';
     public boolean deleteFile = true;
     public String pathToMerge;
+    public ArrayList<String> paths = new ArrayList<String>();
+    public File[] filesIterator = new File[0];
     protected ArrayList<String> errors = new ArrayList<String>();
+
+    public File[] getFilesIterator() {
+        return filesIterator;
+    }
+
+    public void setFilesIterator(ArrayList<String> paths) {
+        ArrayList<File> arrayFiles = new ArrayList<File>();
+
+        for(String s : paths){
+            arrayFiles.add(new File(s));
+        }
+        this.filesIterator = arrayFiles.toArray(new File[0]);
+    }
+
+    public ArrayList<String> getPaths() {
+        return paths;
+    }
+
+    public void setPaths(ArrayList<String> paths) {
+        this.paths = paths;
+    }
 
     public String getPathToMerge() {
         return pathToMerge;
@@ -101,16 +124,19 @@ public class SlkTools {
     public boolean doMerge(){
 
         Boolean resultado = false;
-        if(this.getPathToMerge()==null || this.getFileNameOut()==null){
+        File[] files = this.getFiles();
+        for (File f : files){
+            System.out.println(f.getPath());
+        }
+        System.out.println(files.length);
+        if(this.getFileNameOut()==null){
             this.errors.add("Faltan parametros.");
             return false;
         }
-        File folder = new File(this.getPathToMerge());
-        File[] files = folder.listFiles();
 
         try {
-            String fileNameOut = folder.getAbsolutePath()+"/"+this.getFileNameOut();
-            String fileNameTmp = System.getProperty("java.io.tmpdir")+this.getFileNameOut();
+            String fileNameOut = this.getFileName(this.getFileNameOut());
+            String fileNameTmp = System.getProperty("java.io.tmpdir")+fileNameOut;
             Document doc = new Document();
             FileOutputStream fileTmp = new FileOutputStream(fileNameTmp);
             PdfCopy copy = new PdfCopy(doc,fileTmp);
@@ -131,9 +157,12 @@ public class SlkTools {
             }
             if(countPdfFiles>0){
                 doc.close();
-                this.copyFileToPath(new File(fileNameTmp),new File(fileNameOut));
+                this.copyFileToPath(new File(fileNameTmp),new File(this.getFileNameOut()));
                 resultado=true;
+            }else{
+                this.errors.add("No hay archivos Pdf en el directorio");
             }
+
         } catch (FileNotFoundException e) {
             this.errors.add(e.getMessage());
             //e.printStackTrace();
@@ -199,19 +228,48 @@ public class SlkTools {
 
 
     }
+    /**
+     * obj: Definir la lista de archivos para hacer el merge. dependiendo si es un directorio o un array de paths.
+     * author:jbenavides
+     */
+    public File[] getFiles(){
+        File[] files = new File[0];
+        if(this.getFilesIterator().length>0){
+            files =this.getFilesIterator();
+        }else if(this.getPathToMerge()!=null){
+            files = new File(this.getPathToMerge()).listFiles();
+        }
+        return files;
+    }
+
+    /**
+     * obj: Obtener el nombre del archivo sin el path.
+     * author:jbenavides
+     */
+    public String getFileName(String path){
+        return path.substring(path.lastIndexOf('/')+1);
+
+    }
 
 
     public static void main(String[] args) {
         SlkTools tool = new SlkTools();
-//        tool.setPathToMerge("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP");
-//        tool.setFileNameOut("ActaFinal.pdf");
+//        tool.setPathToMerge("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/");
+        tool.setFileNameOut("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/ActaFinal-itera2.pdf");
 //        System.out.println(tool.doMerge());
 //        System.out.println(tool.getErrors());
-        tool.setFileNameIn("/Users/jbenavides/Desktop/demoTool.pdf");
+//        tool.setFileNameIn("/Users/jbenavides/Desktop/demoTool.pdf");
 //        tool.setVersion('4');
-        tool.setDeleteFile(false);
+//        tool.setDeleteFile(false);
 //        tool.setFileNameOut("demo version.pdf");
-        System.out.println(tool.changeVersion());
+//        System.out.println(tool.changeVersion());
+        ArrayList<String> paths = new ArrayList<String>();
+        paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/PR-PF-FI-01-F47 15.08.13.pdf");
+        paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/_Scanned-image.pdf");
+
+        tool.setFilesIterator(paths);
+        System.out.println(tool.doMerge());
+//        System.out.println(tool.doMergePaths());
         System.out.println(tool.getErrors());
     }
 
