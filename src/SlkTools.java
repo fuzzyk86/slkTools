@@ -16,20 +16,20 @@ public class SlkTools {
     public boolean deleteFile = true;
     public String pathToMerge;
     public ArrayList<String> paths = new ArrayList<String>();
-    public File[] filesIterator = new File[0];
+    public File[] filesPath = new File[0];
     protected ArrayList<String> errors = new ArrayList<String>();
 
-    public File[] getFilesIterator() {
-        return filesIterator;
+    public File[] getFilesPath() {
+        return filesPath;
     }
 
-    public void setFilesIterator(ArrayList<String> paths) {
+    public void setFilesPath(ArrayList<String> paths) {
         ArrayList<File> arrayFiles = new ArrayList<File>();
 
         for(String s : paths){
             arrayFiles.add(new File(s));
         }
-        this.filesIterator = arrayFiles.toArray(new File[0]);
+        this.filesPath = arrayFiles.toArray(new File[0]);
     }
 
     public ArrayList<String> getPaths() {
@@ -234,8 +234,8 @@ public class SlkTools {
      */
     public File[] getFiles(){
         File[] files = new File[0];
-        if(this.getFilesIterator().length>0){
-            files =this.getFilesIterator();
+        if(this.getFilesPath().length>0){
+            files =this.getFilesPath();
         }else if(this.getPathToMerge()!=null){
             files = new File(this.getPathToMerge()).listFiles();
         }
@@ -267,7 +267,7 @@ public class SlkTools {
         paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/PR-PF-FI-01-F47 15.08.13.pdf");
         paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/_Scanned-image.pdf");
 
-        tool.setFilesIterator(paths);
+        tool.setFilesPath(paths);
         System.out.println(tool.doMerge());
 //        System.out.println(tool.doMergePaths());
         System.out.println(tool.getErrors());
