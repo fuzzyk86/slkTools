@@ -125,10 +125,6 @@ public class SlkTools {
 
         Boolean resultado = false;
         File[] files = this.getFiles();
-        for (File f : files){
-            System.out.println(f.getPath());
-        }
-        System.out.println(files.length);
         if(this.getFileNameOut()==null){
             this.errors.add("Faltan parametros.");
             return false;
