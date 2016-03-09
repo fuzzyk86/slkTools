@@ -1,8 +1,9 @@
-import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.Document;
+
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * obj: Clase para cambiar versión de un pdf y para hacer merge de varios pdf en una ruta.
@@ -16,8 +17,27 @@ public class SlkTools {
     public boolean deleteFile = true;
     public String pathToMerge;
     public ArrayList<String> paths = new ArrayList<String>();
+    public ArrayList<String> validExtensions = new ArrayList<String>(Arrays.asList("jpg","jpeg","png","gif","pdf"));
+    public boolean enableImages = false;
     public File[] filesPath = new File[0];
     protected ArrayList<String> errors = new ArrayList<String>();
+
+    public boolean isEnableImages() {
+        return enableImages;
+    }
+
+    public void setEnableImages(boolean enableImages) {
+        this.enableImages = enableImages;
+    }
+
+    public void setValidExtensions(ArrayList<String> validExtensions) {
+        this.validExtensions = validExtensions;
+    }
+
+    public ArrayList<String> getValidExtensions() {
+
+        return validExtensions;
+    }
 
     public File[] getFilesPath() {
         return filesPath;
@@ -138,22 +158,34 @@ public class SlkTools {
             PdfCopy copy = new PdfCopy(doc,fileTmp);
             int countPdfFiles=0;
             for(File file : files){
-
+                boolean isImage = false;
                 doc.open();
-                if(file.isFile() && this.getFileExtension(file).equals(".pdf")){
-                    PdfReader reader = new PdfReader(file.getAbsolutePath());
-                    for(int i=1; i<= reader.getNumberOfPages(); i++){
-                        copy.addPage(copy.getImportedPage(reader,i));
+                String ext = this.getFileExtension(file).substring(1);
+                if(file.isFile() && this.getValidExtensions().contains(ext)){
+                    if(ext.equals("pdf") || (this.enableImages && this.getValidExtensions().contains(ext))){
+                        if(!ext.equals("pdf")){
+                            file = this.imageToPDF(file,System.getProperty("java.io.tmpdir"));
+                            isImage=true;
+                        }
+                        PdfReader reader = new PdfReader(file.getAbsolutePath());
+                        for(int i=1; i<= reader.getNumberOfPages(); i++){
+                            copy.addPage(copy.getImportedPage(reader,i));
+                        }
+                        copy.freeReader(reader);
+                        reader.close();
+                        countPdfFiles++;
+                        if(isImage){
+                            this.deleteSafeFile(file);
+                        }
                     }
-                    copy.freeReader(reader);
-                    reader.close();
-                    countPdfFiles++;
+
                 }
 
             }
             if(countPdfFiles>0){
                 doc.close();
                 this.copyFileToPath(new File(fileNameTmp),new File(this.getFileNameOut()));
+                this.deleteSafeFile(new File(fileNameTmp));
                 resultado=true;
             }else{
                 this.errors.add("No hay archivos Pdf en el directorio");
@@ -171,6 +203,10 @@ public class SlkTools {
         }
 
         return resultado;
+    }
+
+    public void log(String out){
+        System.out.println(out);
     }
 
     /**
@@ -247,11 +283,46 @@ public class SlkTools {
 
     }
 
+    public File imageToPDF(File file, String filePathTmp){
+
+        String ext = this.getFileExtension(file).substring(1);
+        String nameFile = file.getName().substring(0, file.getName().lastIndexOf('.'));
+        String fileNameTmp =filePathTmp+nameFile+".pdf";
+
+        if(this.getValidExtensions().contains(ext)) {
+            Document document = new Document();
+            try {
+                PdfWriter.getInstance(document,
+                        new FileOutputStream(fileNameTmp));
+                document.open();
+                Image image = Image.getInstance(file.getAbsolutePath());
+                document.add(image);
+                document.close();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }
+        return new File(fileNameTmp);
+    }
+
 
     public static void main(String[] args) {
         SlkTools tool = new SlkTools();
+            //tool.setPathToMerge("/Users/jbenavides/Desktop/MergePdf");
+            //tool.setEnableImages(true);
+            ArrayList<String> files = new ArrayList<String>(Arrays.asList("/Users/jbenavides/Sites/Nomina2/dev/Expedientes/SALS560726HZSNGL04/38532.pdf","/Users/jbenavides/Sites/Nomina2/dev/Expedientes/SALS560726HZSNGL04/38533.jpg"));
+            tool.setFilesPath(files);
+            tool.setEnableImages(true);
+            tool.setFileNameOut("/Users/jbenavides/Desktop/MergePdf/MergeFiles.pdf");
+            tool.doMerge();
+
+//        tool.setPathToMerge("/Users/jbenavides/Desktop/actasFinales/3/3/");
+//        tool.setFileNameOut("merge999.pdf");
+//        tool.doMerge();
+
 //        tool.setPathToMerge("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/");
-        tool.setFileNameOut("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/ActaFinal-itera2.pdf");
+//        tool.setFileNameOut("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/ActaFinal-itera2.pdf");
 //        System.out.println(tool.doMerge());
 //        System.out.println(tool.getErrors());
 //        tool.setFileNameIn("/Users/jbenavides/Desktop/demoTool.pdf");
@@ -259,14 +330,14 @@ public class SlkTools {
 //        tool.setDeleteFile(false);
 //        tool.setFileNameOut("demo version.pdf");
 //        System.out.println(tool.changeVersion());
-        ArrayList<String> paths = new ArrayList<String>();
-        paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/PR-PF-FI-01-F47 15.08.13.pdf");
-        paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/_Scanned-image.pdf");
-
-        tool.setFilesPath(paths);
-        System.out.println(tool.doMerge());
-//        System.out.println(tool.doMergePaths());
-        System.out.println(tool.getErrors());
+//        ArrayList<String> paths = new ArrayList<String>();
+//        paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/PR-PF-FI-01-F47 15.08.13.pdf");
+//        paths.add("/Users/jbenavides/sites/ASE_2015/auditoria/actasFinales/1/OP/_Scanned-image.pdf");
+//
+//        tool.setFilesPath(paths);
+//        System.out.println(tool.doMerge());
+////        System.out.println(tool.doMergePaths());
+//        System.out.println(tool.getErrors());
     }
 
 
