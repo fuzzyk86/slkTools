@@ -13,6 +13,8 @@ public class SlkTools {
 
     public String fileNameIn;
     public String fileNameOut;
+    public String pathFileNameOut;
+    public String pathFileNameIn;
     public Character version = '4';
     public boolean deleteFile = true;
     public String pathToMerge;
@@ -100,6 +102,14 @@ public class SlkTools {
         return version;
     }
 
+    public String getPathFileNameOut() {
+        return pathFileNameOut;
+    }
+
+    public String getPathFileNameIn() {
+        return pathFileNameIn;
+    }
+
     public void setVersion(Character version) {
         this.version = version;
     }
@@ -108,22 +118,25 @@ public class SlkTools {
     /*
     * obj: Lee un archivo pdf y la convierte a una versión menor o viceversa
     * author:jbenavides
+    *
+    * actualización 13 de diciembre 2016 (actualizacion a ruta completa para
+    * guardar el archivo en una ruta diferente)
     */
     public Boolean changeVersion(){
         Boolean resultado = false;
-        if(this.getFileNameIn()==null || this.getFileNameOut()==null){
+        if(this.getPathFileNameIn()==null || this.getPathFileNameOut()==null){
             this.errors.add("Faltan parametros.");
             return false;
         }
         try {
-            String baseName = this.fileNameIn.substring(0,this.fileNameIn.lastIndexOf('/')+1);
-            PdfReader reader = new PdfReader(this.getFileNameIn());
-            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(baseName.concat(this.getFileNameOut())),this.getVersion());
+            String baseNameOut = this.pathFileNameOut;
+            PdfReader reader = new PdfReader(this.getPathFileNameIn());
+            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(baseNameOut),this.getVersion());
             stamper.close();
             reader.close();
 
             if(this.isDeleteFile()){
-                this.deleteSafeFile(new File(this.getFileNameIn()));
+                this.deleteSafeFile(new File(this.getPathFileNameIn()));
             }
             resultado =true;
 
