@@ -14,6 +14,15 @@ public class SlkTools {
     public String fileNameIn;
     public String fileNameOut;
     public String pathFileNameOut;
+
+    public void setPathFileNameOut(String pathFileNameOut) {
+        this.pathFileNameOut = pathFileNameOut;
+    }
+
+    public void setPathFileNameIn(String pathFileNameIn) {
+        this.pathFileNameIn = pathFileNameIn;
+    }
+
     public String pathFileNameIn;
     public Character version = '4';
     public boolean deleteFile = true;
